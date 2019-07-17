@@ -1,0 +1,35 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t gaussoin07/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true gaussoin07/react-test npm run test
+
+after_success:
+  - docker build -t gaussoin07/multi-client -f ./client
+  - docker build -t gaussoin07/multi-nginx -f ./nginx
+  - docker build -t gaussoin07/multi-server -f ./server
+  - docker build -t gaussoin07/multi-worker -f ./worker
+
+#   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+#   - docker push gaussoin07/multi-client
+#   - docker push gaussoin07/multi-nginx
+#   - docker push gaussoin07/multi-server
+#   - docker push gaussoin07/multi-worker
+
+# deploy:
+#   provider: elaticbeanstalk
+#   region: us-east-1
+#   app: multi-docker
+#   env: Multidocker-env
+#   bucket_name: slkdjflskjdfkad
+#   bucket_path: docker-multi
+#   on:
+#     branch: master
+#   access_key_id:
+#     secure: $AWS_ACCESS_KEY
+#   secret_access_key: 
+#     seucre: $AWS_SECRET_KEY
